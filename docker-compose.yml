@@ -1,0 +1,38 @@
+# version: '3.8'
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: grip_invest
+      MYSQL_USER: grip_user
+      MYSQL_PASSWORD: grip_pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - dbdata:/var/lib/mysql
+
+  backend:
+    build: ./backend
+    env_file:
+      - ./backend/.env
+    environment:
+      - DB_HOST=db
+      - DB_USER=grip_user
+      - DB_PASS=grip_pass
+      - DB_NAME=grip_invest
+      - JWT_SECRET=supersecret_jwt_key
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+volumes:
+  dbdata:
